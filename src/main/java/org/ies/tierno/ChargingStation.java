@@ -1,5 +1,6 @@
 package org.ies.tierno;
 
+import java.util.Objects;
 import java.util.concurrent.Semaphore;
 
 public class ChargingStation {
@@ -10,6 +11,26 @@ public class ChargingStation {
         this.sStats = sStats;
     }
 
+    public StationStats getsStats() {
+        return sStats;
+    }
+
+    public void setsStats(StationStats sStats) {
+        this.sStats = sStats;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        ChargingStation that = (ChargingStation) o;
+        return Objects.equals(charges, that.charges) && Objects.equals(sStats, that.sStats);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(charges, sStats);
+    }
+
     public ChargeResult charge(Vehicle vehicle) {
 
         try {
@@ -18,9 +39,10 @@ public class ChargingStation {
             Thread.sleep(vehicle.kwh() * 20L);
             sStats.register(vehicle.kwh());
             System.out.println(vehicle.plate() + " Finalizó la carga");
-            charges.release(1);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
+        } finally {
+            charges.release(1);
         }
         return new ChargeResult(vehicle.plate(), vehicle.kwh(), vehicle.kwh() * 45);
     }
