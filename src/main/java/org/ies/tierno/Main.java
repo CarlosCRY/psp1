@@ -6,12 +6,13 @@ import java.util.List;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class Main {
     private static Random random = new Random();
     private static final int NVEHICLES = 20;
     private static final int OCHO = 8;
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException{
         ChargingStation cStation = new ChargingStation(new StationStats(0,0));
         List<Vehicle> vehicles = new ArrayList<>();
 
@@ -25,6 +26,10 @@ public class Main {
                     System.out.println(cStation.charge(vehicle));
             });
         }
+
+        eso.shutdown();
+
+        eso.awaitTermination(10, TimeUnit.SECONDS);
 
         System.out.println(cStation.getsStats().snapshot());
 
